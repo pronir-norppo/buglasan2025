@@ -241,9 +241,9 @@ function renderPopup(record){
   wrapper.style.overflowY = 'auto';
   let html = `<strong>${escapeHtml(record.area)}</strong><br>
     <b>Shift:</b> ${escapeHtml(record.shift)}<br>
-    <b>Comms:</b> ${escapeHtml(record.comm)}<br>
+    <b>Communication Capability:</b> ${escapeHtml(record.comm)}<br>
     <b>Call Sign:</b> ${escapeHtml(record.callsign)}<br>
-    <b>Standby:</b> ${escapeHtml(record.landmark)}<hr>`;
+    <b>Standby Point:</b> ${escapeHtml(record.landmark)}<hr>`;
   if(record.PersonnelList && record.PersonnelList.length){
     record.PersonnelList.forEach(p => {
       const v = p.mobile || '';
@@ -276,9 +276,9 @@ function addMarkerFor(record){
   if(!record.latlng) return null;
   const s = normalize(record.shift || '');
   let color = 'yellow';
-  if(s.includes('alpha')) color = 'green';
-  else if(s.includes('bravo')) color = 'blue';
-  else if(s.includes('charlie')) color = 'orange';
+  if(s.includes('1st Shift (6am-4pm)')) color = 'green';
+  else if(s.includes('2nd Shift (4pm-2am)')) color = 'purple';
+  else if(s.includes('3rd Shift (8pm-6am)')) color = 'orange';
   
   // Create a Font Awesome icon with background color
   const icon = L.divIcon({
