@@ -10,18 +10,54 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
 
   <style>
-    :root{
-      --bg:#0a0a0a; --panel:#121212; --text:#f3f3f3; --gold:#ffcc00;
-      --accent1:#ff0077; --accent2:#ff6600; --accent3:#ffee00; --accent4:#00ff99; --accent5:#0099ff;
+    :root {
+		--bg:#0a0a0a;
+		--panel:#121212;
+		--text:#f3f3f3;
+		--gold:#ffcc00;
+		--accent1:#ff0077;
+		--accent2:#ff6600;
+		--accent3:#ffee00;
+		--accent4:#00ff99;
+		--accent5:#0099ff;
+	}
+    html,body {
+		height:100%;
+		margin:0;
+		background:var(--bg);
+		color:var(--text);
+		font-family:Inter,Arial,sans-serif;
+	}
+    
+	header {
+		background: linear-gradient(90deg, var(--accent1), var(--accent2), var(--accent3), var(--accent4), var(--accent5));
+		background-size: 300% 300%;
+		background-color: var(--bg); /* Fallback to --bg (#0a0a0a) */
+		animation: gradientFlow 8s linear infinite;
+		padding: 10px 16px;
+		display: flex;
+		align-items: center;
+		gap: 14px;
+		position: relative;
+		z-index: 1; /* Ensure header is above other elements */
     }
-    html,body{height:100%;margin:0;background:var(--bg);color:var(--text);font-family:Inter,Arial,sans-serif;}
-    header{
-      background:linear-gradient(90deg,var(--accent1),var(--accent2),var(--accent3),var(--accent4),var(--accent5));
-      background-size:300% 300%; animation:gradientFlow 8s linear infinite;
-      padding:10px 16px; display:flex; align-items:center; gap:14px;
+    header::before {
+		content: '';
+		position: absolute;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		background: rgba(0,0,0,0.3); /* Black with 30% opacity */
+		z-index: -1; /* Place behind gradient */
     }
-    @keyframes gradientFlow{0%{background-position:0 50%}50%{background-position:100% 50%}100%{background-position:0 50%}}
-    header img{height:46px;border-radius:50%;background:#fff;padding:4px}
+   @keyframes gradientFlow {
+   0% { background-position: 0 50%; }
+   50% { background-position: 100% 50%; }
+   100% { background-position: 0 50%; }
+   }
+    
+	header img{height:50px;border-radius:50%;background:#fff;padding:1.5px}
     header h1{margin:0;font-size:18px;font-weight:700;color:#fff;text-shadow:0 1px 6px rgba(0,0,0,0.6)}
     nav{margin-left:auto;display:flex;gap:10px;align-items:center}
     nav select,nav button{transition:0.2s all}
@@ -29,10 +65,10 @@
     nav select,nav button{padding:6px 10px;border-radius:8px;border:none;background:#1f1f1f;color:#fff}
     .app{display:flex;height:calc(100vh - 72px)}
     .sidebar{width:32%;min-width:320px;background:var(--panel);padding:14px;overflow:auto;border-right:1px solid rgba(255,255,255,0.04)}
-	h1{margin-left:10px; padding: 4px 8px; background: rgba(0,0,0,0.4); border-radius: 4px; color: #fff; font-family: 'Helvetica'; font-size: 28px; font-weight: 400; letter-spacing: 0.5px;}
+    h1{margin-left:10px; padding: 4px 8px; border-radius: 4px; color: #fff; font-family: 'Helvetica'; font-size: 28px; font-weight: 400; letter-spacing: 0.5px;}
     h2{margin:0 0 8px 0;color:var(--gold);font-size:14px;text-transform:uppercase}
     table{width:100%;border-collapse:collapse;font-size:13px}
-    th,td{padding:8px;border-bottom:1px solid rgba(255,255,255,0.04);vertical-align:middle}
+    th, td {padding: 8px; border: 1px solid rgba(255,255,255,0.2);vertical-align: middle;}
     th{color:var(--gold);text-align:left}
     .person-row{cursor:pointer}
     .person-row:hover{background:rgba(0,255,204,0.03)}
@@ -74,7 +110,7 @@
   <div class="app">
     <div class="sidebar">
       <div id="lastUpdated" style="font-size:11px;color:#aaa;margin-bottom:4px">Last updated: --</div><br>
-      <h2>Personnel</h2>
+      <h2>List of Personnel</h2>
       <table id="personnelTable">
         <thead>
           <tr><th>Name</th><th>Contact</th><th>Call Sign</th><th>Shift</th></tr>
@@ -132,17 +168,21 @@ function parseLatLng(val){
   return null;
 }
 
-/* parse personnel strings like "PSSg Ray (09553279424)" or "Name - 0955..." or "+639..." */
+/* parse personnel strings like "PSSg Ray (09553279424), PSSg Leover Ijan (09553279424)" */
 function parsePersonnel(raw){
   if(!raw) return [];
-  return String(raw).split(/[;\n]+/).map(x=>x.trim()).filter(Boolean).map(p=>{
-    const m = p.match(/^(.*?)[\s\(,-]*(\+?[0-9]{8,14})\)?$/);
+  // Split on semicolons, newlines, or commas
+  return String(raw).split(/[;\n,]+/).map(x => x.trim()).filter(Boolean).map(p => {
+    // Match name and optional mobile number
+    const m = p.match(/^(.*?)(\s*\(?\s*(\+?[0-9]{8,14})\)?)?$/);
     if(m){
-      let num = m[2].trim();
-      const digits = num.replace(/\D/g,'');
-      if(digits.length===11 && digits.startsWith('0')) num = '+63' + digits.slice(1);
-      else if(digits.length===10 && digits.startsWith('9')) num = '+63' + digits;
-      else if(!num.startsWith('+') && /^\d+$/.test(num)) num = digits;
+      let num = m[3] ? m[3].trim() : '';
+      if(num){
+        const digits = num.replace(/\D/g,'');
+        if(digits.length === 11 && digits.startsWith('0')) num = '+63' + digits.slice(1);
+        else if(digits.length === 10 && digits.startsWith('9')) num = '+63' + digits;
+        else if(!num.startsWith('+') && /^\d+$/.test(num)) num = digits;
+      }
       return { name: m[1].trim(), mobile: num };
     }
     return { name: p, mobile: '' };
@@ -177,8 +217,8 @@ function normalizeToViber(num){
   let n = String(num).trim();
   if(n.startsWith('+')) return n;
   const digits = n.replace(/\D/g,'');
-  if(digits.length===11 && digits.startsWith('0')) return '+63'+digits.slice(1);
-  if(digits.length===10 && digits.startsWith('9')) return '+63'+digits;
+  if(digits.length === 11 && digits.startsWith('0')) return '+63' + digits.slice(1);
+  if(digits.length === 10 && digits.startsWith('9')) return '+63' + digits;
   return digits || '';
 }
 
@@ -234,29 +274,34 @@ function clearMarkers(){
   displayedMarkers = [];
 }
 
-function renderPopup(record){
+function renderPopup(record) {
   const wrapper = document.createElement('div');
   wrapper.style.maxWidth = '300px';
   wrapper.style.maxHeight = '70vh';
   wrapper.style.overflowY = 'auto';
   let html = `<strong>${escapeHtml(record.area)}</strong><br>
-    <b>Shift:</b> ${escapeHtml(record.shift)}<br>
+    <b>Shift:</b> ${escapeHtml(record.displayShift || record.shift || 'Unspecified')}<br>
     <b>Communication Capability:</b> ${escapeHtml(record.comm)}<br>
     <b>Call Sign:</b> ${escapeHtml(record.callsign)}<br>
-    <b>Standby Point:</b> ${escapeHtml(record.landmark)}<hr>`;
-  if(record.PersonnelList && record.PersonnelList.length){
-    record.PersonnelList.forEach(p => {
+    <b>Standby Point:</b> ${escapeHtml(record.landmark)}<br>
+    <b>Personnel on Duty:</b><br>`;
+  
+  if (record.PersonnelList && record.PersonnelList.length) {
+    record.PersonnelList.forEach((p, index) => {
       const v = p.mobile || '';
       const viber = normalizeToViber(v);
-      const link = viber ? `<a href="viber://chat?number=${encodeURIComponent(viber)}" style="color:#00ffcc;text-decoration:none">${escapeHtml(v)}</a>` : 'no mobile';
-      html += `<div style="margin-bottom:6px"><b>${escapeHtml(p.name)}</b><br><span style="opacity:0.9">${link}</span></div>`;
+      const link = viber ? `<b><a href="viber://chat?number=${encodeURIComponent(viber)}" style="border-radius: 5px;background:#0f0;color:#000;text-decoration:none">${escapeHtml(v)}</a></b>` : 'no mobile';
+      html += `${index + 1}. ${escapeHtml(p.name)}<br><span style="margin-left:15px;opacity:0.9">Mobile #: ${link}</span><br>`;
     });
+  } else {
+    html += '<span style="opacity:0.9">No personnel listed</span><br>';
   }
+
   wrapper.innerHTML = html;
 
-  if(record.photo){
+  if (record.photo) {
     const imgUrl = makeDisplayUrl(record.photo || "");
-    if(imgUrl){
+    if (imgUrl) {
       const img = document.createElement('img');
       img.src = imgUrl;
       img.style.maxWidth = '100%';
@@ -272,14 +317,24 @@ function renderPopup(record){
   return wrapper;
 }
 
-function addMarkerFor(record){
-  if(!record.latlng) return null;
+function addMarkerFor(record) {
+  if (!record.latlng) return null;
   const s = normalize(record.shift || '');
-  let color = 'yellow';
-  if(s.includes('1st Shift (6am-4pm)')) color = 'green';
-  else if(s.includes('2nd Shift (4pm-2am)')) color = 'purple';
-  else if(s.includes('3rd Shift (8pm-6am)')) color = 'orange';
-  
+
+  // Define shift-to-color mapping
+  const shiftColors = [
+    { pattern: /1st.*shift/i, color: 'green', label: '1st Shift' },
+    { pattern: /2nd.*shift/i, color: 'purple', label: '2nd Shift' },
+    { pattern: /3rd.*shift/i, color: 'orange', label: '3rd Shift' },
+    { pattern: /other/i, color: 'gray', label: 'Others' },
+    { pattern: /.*/, color: 'yellow', label: 'Unspecified' } // Fallback for unmatched shifts
+  ];
+
+  // Find the matching shift
+  const shiftMatch = shiftColors.find(sc => s.match(sc.pattern));
+  const color = shiftMatch ? shiftMatch.color : 'yellow';
+  const shiftLabel = shiftMatch ? shiftMatch.label : 'Unspecified';
+
   // Create a Font Awesome icon with background color
   const icon = L.divIcon({
     html: `<i class="fas fa-map-marker-alt fa-marker" style="--marker-bg: ${color};"></i>`,
@@ -288,40 +343,57 @@ function addMarkerFor(record){
     iconAnchor: [15, 30],
     popupAnchor: [0, -30]
   });
-  
+
   const marker = L.marker([record.latlng.lat, record.latlng.lng], { icon }).addTo(map);
+  // Update the record's shift label for consistent display
+  record.displayShift = shiftLabel;
   marker.bindPopup(renderPopup(record));
   displayedMarkers.push({ marker, data: record });
   return marker;
 }
 
 /* -------------------- Table rendering -------------------- */
-function renderPersonnelTable(filtered){
+function renderPersonnelTable(filtered) {
   personnelTbody.innerHTML = '';
-  if(selectedStation === 'All'){
+  if (selectedStation === 'All') {
     personnelTbody.innerHTML = '<tr><td colspan="4" style="opacity:0.6;padding:10px;text-align:center">Select Area to view duty personnel</td></tr>';
     togglePersonnel.style.display = 'none';
     return;
   }
+
+  const shiftColors = [
+    { pattern: /1st.*shift/i, color: 'green', label: '1st Shift' },
+    { pattern: /2nd.*shift/i, color: 'purple', label: '2nd Shift' },
+    { pattern: /3rd.*shift/i, color: 'orange', label: '3rd Shift' },
+    { pattern: /other/i, color: 'gray', label: 'Others' },
+    { pattern: /.*/, color: 'yellow', label: 'Unspecified' }
+  ];
+
   const rows = [];
   filtered.forEach(r => {
-    const names = (r.PersonnelList || []).map(p => p.name).join(', ');
-    const mobile = (r.PersonnelList || []).find(p => p.mobile) || {};
-    rows.push({ name: names || 'Unnamed', mobile: mobile.mobile || '', call: r.callsign || '', shift: r.shift || '', r });
+    const personnelList = r.PersonnelList || [];
+    const firstPerson = personnelList[0] || { name: 'Unnamed', mobile: '' };
+    const name = personnelList.length > 1 ? `${firstPerson.name} and buddy` : firstPerson.name;
+    const mobile = firstPerson.mobile || '';
+    const s = normalize(r.shift || '');
+    const shiftMatch = shiftColors.find(sc => s.match(sc.pattern));
+    const shiftColor = shiftMatch ? shiftMatch.color : 'yellow';
+    const shiftLabel = r.displayShift || (shiftMatch ? shiftMatch.label : 'Unspecified');
+    rows.push({ name: name, mobile: mobile, call: r.callsign || '', shift: shiftLabel, shiftColor, r });
   });
 
-  const visible = personnelExpanded ? rows : rows.slice(0,6);
+  const visible = personnelExpanded ? rows : rows.slice(0, 6);
   visible.forEach(p => {
     const tr = document.createElement('tr');
     tr.className = 'person-row';
     const viberNum = normalizeToViber(p.mobile);
     const viberLink = viberNum ? `<a href="viber://chat?number=${encodeURIComponent(viberNum)}" style="color:#00ffcc;text-decoration:none">${escapeHtml(p.mobile)}</a>` : 'no mobile';
-    tr.innerHTML = `<td>${escapeHtml(p.name)}</td><td>${viberLink}</td><td>${escapeHtml(p.call)}</td><td>${escapeHtml(p.shift)}</td>`;
+    tr.innerHTML = `<td>${escapeHtml(p.name)}</td><td>${viberLink}</td><td>${escapeHtml(p.call)}</td><td style="color:${p.shiftColor}">${escapeHtml(p.shift)}</td>`;
     tr.onclick = () => {
       document.querySelectorAll('.person-row.selected').forEach(x => x.classList.remove('selected'));
       tr.className = 'person-row selected';
       const m = displayedMarkers.find(x => x.data === p.r);
-      if(m){
+      if (m) {
         map.flyTo(m.marker.getLatLng(), 18);
         m.marker.openPopup();
       }
