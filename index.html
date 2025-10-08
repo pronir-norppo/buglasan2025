@@ -5,94 +5,78 @@
   <title>Buglasan 2025 - Deployment Dashboard</title>
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
 
   <style>
     :root {
-		--bg:#0a0a0a;
-		--panel:#121212;
-		--text:#f3f3f3;
-		--gold:#ffcc00;
-		--accent1:#ff0077;
-		--accent2:#ff6600;
-		--accent3:#ffee00;
-		--accent4:#00ff99;
-		--accent5:#0099ff;
-	}
-    html,body {
-		height:100%;
-		margin:0;
-		background:var(--bg);
-		color:var(--text);
-		font-family:Inter,Arial,sans-serif;
-	}
-    
-	header {
-		background: linear-gradient(90deg, var(--accent1), var(--accent2), var(--accent3), var(--accent4), var(--accent5));
-		background-size: 300% 300%;
-		background-color: var(--bg); /* Fallback to --bg (#0a0a0a) */
-		animation: gradientFlow 8s linear infinite;
-		padding: 10px 16px;
-		display: flex;
-		align-items: center;
-		gap: 14px;
-		position: relative;
-		z-index: 1; /* Ensure header is above other elements */
+      --bg: #0a0a0a;
+      --panel: #121212;
+      --text: #f3f3f3;
+      --gold: #ffcc00;
+      --accent1: #ff0077;
+      --accent2: #ff6600;
+      --accent3: #ffee00;
+      --accent4: #00ff99;
+      --accent5: #0099ff;
+    }
+    html, body {
+      height: 100%;
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: Inter, Arial, sans-serif;
+    }
+    header {
+      background: linear-gradient(90deg, var(--accent1), var(--accent2), var(--accent3), var(--accent4), var(--accent5));
+      background-size: 300% 300%;
+      background-color: var(--bg);
+      animation: gradientFlow 8s linear infinite;
+      padding: 10px 16px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      position: relative;
+      z-index: 1;
     }
     header::before {
-		content: '';
-		position: absolute;
-		top: 0;
-		left: 0;
-		right: 0;
-		bottom: 0;
-		background: rgba(0,0,0,0.3); /* Black with 30% opacity */
-		z-index: -1; /* Place behind gradient */
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.3);
+      z-index: -1;
     }
-   @keyframes gradientFlow {
-   0% { background-position: 0 50%; }
-   50% { background-position: 100% 50%; }
-   100% { background-position: 0 50%; }
-   }
-    
-	header img{height:50px;border-radius:50%;background:#fff;padding:1.5px}
-    header h1{margin:0;font-size:18px;font-weight:700;color:#fff;text-shadow:0 1px 6px rgba(0,0,0,0.6)}
-    nav{margin-left:auto;display:flex;gap:10px;align-items:center}
-    nav select,nav button{transition:0.2s all}
-    nav select:hover,nav button:hover{background:#0f0;color:#000}
-    nav select,nav button{padding:6px 10px;border-radius:8px;border:none;background:#1f1f1f;color:#fff}
-    .app{display:flex;height:calc(100vh - 72px)}
-    .sidebar{width:32%;min-width:320px;background:var(--panel);padding:14px;overflow:auto;border-right:1px solid rgba(255,255,255,0.04)}
-    h1{margin-left:10px; padding: 4px 8px; border-radius: 4px; color: #fff; font-family: 'Helvetica'; font-size: 28px; font-weight: 400; letter-spacing: 0.5px;}
-    h2{margin:0 0 8px 0;color:var(--gold);font-size:14px;text-transform:uppercase}
-    table{width:100%;border-collapse:collapse;font-size:13px}
-    th, td {padding: 8px; border: 1px solid rgba(255,255,255,0.2);vertical-align: middle;}
-    th{color:var(--gold);text-align:left}
-    .person-row{cursor:pointer}
-    .person-row:hover{background:rgba(0,255,204,0.03)}
-    .person-row.selected{background:rgba(255,204,0,0.08);color:var(--gold)}
-    .main{flex:1;position:relative;padding:8px}
-    #map{height:100%;border-radius:8px;overflow:hidden}
-    #summaryBox{position:absolute;left:12px;bottom:12px;background:rgba(0,0,0,0.6);padding:8px;border-radius:6px;color:var(--gold);font-size:10px;}
+    @keyframes gradientFlow {
+      0% { background-position: 0 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0 50%; }
+    }
+    header img { height: 50px; border-radius: 50%; background: #fff; padding: 1.5px; }
+    header h1 { margin: 0; font-size: 18px; font-weight: 700; color: #fff; text-shadow: 0 1px 6px rgba(0,0,0,0.6); }
+    nav { margin-left: auto; display: flex; gap: 10px; align-items: center; }
+    nav select, nav button { transition: 0.2s all; }
+    nav select:hover, nav button:hover { background: #0f0; color: #000; }
+    nav select, nav button { padding: 6px 10px; border-radius: 8px; border: none; background: #1f1f1f; color: #fff; }
+    .app { display: flex; height: calc(100vh - 72px); }
+    .sidebar { width: 32%; min-width: 320px; background: var(--panel); padding: 14px; overflow: auto; border-right: 1px solid rgba(255,255,255,0.04); }
+    h1 { margin-left: 10px; padding: 4px 8px; border-radius: 4px; color: #fff; font-family: 'Helvetica'; font-size: 28px; font-weight: 400; letter-spacing: 0.5px; }
+    h2 { margin: 0 0 8px 0; color: var(--gold); font-size: 14px; text-transform: uppercase; }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    th, td { padding: 8px; border: 1px solid rgba(255,255,255,0.2); vertical-align: middle; }
+    th { color: var(--gold); text-align: left; }
+    .person-row { cursor: pointer; }
+    .person-row:hover { background: rgba(0,255,204,0.03); }
+    .person-row.selected { background: rgba(255,204,0,0.08); color: var(--gold); }
+    .main { flex: 1; position: relative; padding: 8px; }
+    #map { height: 100%; border-radius: 8px; overflow: hidden; }
+    #summaryBox { position: absolute; left: 12px; bottom: 12px; background: rgba(0,0,0,0.6); padding: 8px; border-radius: 6px; color: var(--gold); font-size: 10px; }
     .leaflet-popup-content-wrapper { max-height: 70vh; overflow-y: auto; }
     .leaflet-popup-content { font-size: 12px; line-height: 1.4; max-width: 300px; }
     .leaflet-popup-content img { max-width: 100%; height: auto; }
-    .fa-marker { 
-      font-size: 20px; 
-      color: white; 
-      background: var(--marker-bg, yellow); 
-      padding: 5px; 
-      border-radius: 50%; 
-      width: 30px; 
-      height: 30px; 
-      display: flex; 
-      align-items: center; 
-      justify-content: center; 
-      box-shadow: 0 2px 5px rgba(0,0,0,0.3); 
-    }
-    @media (max-width:880px){ .sidebar{width:42%} }
+    @media (max-width: 880px) { .sidebar { width: 42%; } }
   </style>
 </head>
 <body>
@@ -131,57 +115,51 @@
 const DEPLOYMENT_CSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vR4VtzZRxV-Z2wes5L5yta77awXf7PMEaDJPu1nvFr1hXEcRa7NaHPk2R0McPW-xMTsKSCuufRXoE7U/pub?output=csv";
 
 /* -------------------- Helpers -------------------- */
-function escapeHtml(s){ return (s||'').toString().replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":"&#39;"})[c]); }
-function normalize(s){ return (s||'').toString().trim().toLowerCase(); }
+function escapeHtml(s) { return (s || '').toString().replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]); }
+function normalize(s) { return (s || '').toString().trim().toLowerCase(); }
 
-/* tolerant field getter: try exact, then case-insensitive contains */
-function getField(row, ...keys){
-  if(!row) return '';
-  for(const k of keys){ if(k in row && row[k]) return row[k]; }
-  const cols = Object.keys(row||{});
-  for(const k of keys){
+function getField(row, ...keys) {
+  if (!row) return '';
+  for (const k of keys) { if (k in row && row[k]) return row[k]; }
+  const cols = Object.keys(row || {});
+  for (const k of keys) {
     const target = k.toString().trim().toLowerCase();
-    for(const c of cols){
-      if(c && c.toString().trim().toLowerCase().includes(target) && row[c]) return row[c];
+    for (const c of cols) {
+      if (c && c.toString().trim().toLowerCase().includes(target) && row[c]) return row[c];
     }
   }
   return '';
 }
 
-/* fetch CSV safely (adds &t= only when needed) */
-async function fetchCsv(url){
+async function fetchCsv(url) {
   const sep = url.includes('?') ? '&' : '?';
   const res = await fetch(url + `${sep}t=${Date.now()}`, { cache: 'no-store' });
-  if(!res.ok) throw new Error('CSV fetch failed: ' + res.status);
+  if (!res.ok) throw new Error('CSV fetch failed: ' + res.status);
   const txt = await res.text();
   return Papa.parse(txt, { header: true, skipEmptyLines: true }).data;
 }
 
-/* parse latitude,longitude strings */
-function parseLatLng(val){
-  if(!val) return null;
-  const parts = String(val).replace(/[()]/g,'').split(/[;,\s]+/).filter(Boolean);
-  if(parts.length>=2){
+function parseLatLng(val) {
+  if (!val) return null;
+  const parts = String(val).replace(/[()]/g, '').split(/[;,\s]+/).filter(Boolean);
+  if (parts.length >= 2) {
     const a = parseFloat(parts[0]), b = parseFloat(parts[1]);
-    if(!isNaN(a) && !isNaN(b)) return { lat: a, lng: b };
+    if (!isNaN(a) && !isNaN(b)) return { lat: a, lng: b };
   }
   return null;
 }
 
-/* parse personnel strings like "PSSg Ray (09553279424), PSSg Leover Ijan (09553279424)" */
-function parsePersonnel(raw){
-  if(!raw) return [];
-  // Split on semicolons, newlines, or commas
+function parsePersonnel(raw) {
+  if (!raw) return [];
   return String(raw).split(/[;\n,]+/).map(x => x.trim()).filter(Boolean).map(p => {
-    // Match name and optional mobile number
     const m = p.match(/^(.*?)(\s*\(?\s*(\+?[0-9]{8,14})\)?)?$/);
-    if(m){
+    if (m) {
       let num = m[3] ? m[3].trim() : '';
-      if(num){
-        const digits = num.replace(/\D/g,'');
-        if(digits.length === 11 && digits.startsWith('0')) num = '+63' + digits.slice(1);
-        else if(digits.length === 10 && digits.startsWith('9')) num = '+63' + digits;
-        else if(!num.startsWith('+') && /^\d+$/.test(num)) num = digits;
+      if (num) {
+        const digits = num.replace(/\D/g, '');
+        if (digits.length === 11 && digits.startsWith('0')) num = '+63' + digits.slice(1);
+        else if (digits.length === 10 && digits.startsWith('9')) num = '+63' + digits;
+        else if (!num.startsWith('+') && /^\d+$/.test(num)) num = digits;
       }
       return { name: m[1].trim(), mobile: num };
     }
@@ -189,36 +167,34 @@ function parsePersonnel(raw){
   });
 }
 
-/* convert google drive/photo links to displayable image URL when possible */
-function makeDisplayUrl(raw){
-  if(!raw) return '';
+function makeDisplayUrl(raw) {
+  if (!raw) return '';
   let url = String(raw).trim();
   const m = url.match(/IMAGE\(["']?(https[^"')]+)["']?\)/i);
-  if(m) url = m[1];
+  if (m) url = m[1];
   try {
-    if(url.includes("open?id=")){
+    if (url.includes("open?id=")) {
       const id = new URL(url).searchParams.get("id");
-      if(id) return `https://drive.google.com/thumbnail?id=${id}&sz=w420`;
+      if (id) return `https://drive.google.com/thumbnail?id=${id}&sz=w420`;
     }
-    if(url.includes("/file/d/")){
+    if (url.includes("/file/d/")) {
       const match = url.match(/\/file\/d\/([^/]+)\//);
-      if(match) return `https://drive.google.com/thumbnail?id=${match[1]}&sz=w420`;
+      if (match) return `https://drive.google.com/thumbnail?id=${match[1]}&sz=w420`;
     }
-    if(url.startsWith("http")) return url;
-  } catch(e){
+    if (url.startsWith("http")) return url;
+  } catch (e) {
     console.warn("[IMG PARSER] Failed:", raw, e);
   }
   return 'https://via.placeholder.com/160x90.png';
 }
 
-/* normalize phone for viber */
-function normalizeToViber(num){
-  if(!num) return '';
+function normalizeToViber(num) {
+  if (!num) return '';
   let n = String(num).trim();
-  if(n.startsWith('+')) return n;
-  const digits = n.replace(/\D/g,'');
-  if(digits.length === 11 && digits.startsWith('0')) return '+63' + digits.slice(1);
-  if(digits.length === 10 && digits.startsWith('9')) return '+63' + digits;
+  if (n.startsWith('+')) return n;
+  const digits = n.replace(/\D/g, '');
+  if (digits.length === 11 && digits.startsWith('0')) return '+63' + digits.slice(1);
+  if (digits.length === 10 && digits.startsWith('9')) return '+63' + digits;
   return digits || '';
 }
 
@@ -269,8 +245,8 @@ setInterval(updateClock, 1000);
 updateClock();
 
 /* -------------------- Markers & UI rendering -------------------- */
-function clearMarkers(){
-  displayedMarkers.forEach(m => { try { map.removeLayer(m.marker); } catch(e){} });
+function clearMarkers() {
+  displayedMarkers.forEach(m => { try { map.removeLayer(m.marker); } catch(e) {} });
   displayedMarkers = [];
 }
 
@@ -321,31 +297,57 @@ function addMarkerFor(record) {
   if (!record.latlng) return null;
   const s = normalize(record.shift || '');
 
-  // Define shift-to-color mapping
-  const shiftColors = [
-    { pattern: /1st.*shift/i, color: 'green', label: '1st Shift' },
-    { pattern: /2nd.*shift/i, color: 'purple', label: '2nd Shift' },
-    { pattern: /3rd.*shift/i, color: 'orange', label: '3rd Shift' },
-    { pattern: /other/i, color: 'gray', label: 'Others' },
-    { pattern: /.*/, color: 'yellow', label: 'Unspecified' } // Fallback for unmatched shifts
+  // Define shift-to-color and image mapping
+  const shiftConfigs = [
+    {
+      pattern: /1st.*shift/i,
+      color: 'green',
+      label: 'Shift 1',
+      iconUrl: 'https://raw.githubusercontent.com/your-username/your-repo/main/images/shift1.png'
+    },
+    {
+      pattern: /2nd.*shift/i,
+      color: 'purple',
+      label: 'Shift 2',
+      iconUrl: 'https://raw.githubusercontent.com/your-username/your-repo/main/images/shift2.png'
+    },
+    {
+      pattern: /3rd.*shift/i,
+      color: 'orange',
+      label: 'Shift 3',
+      iconUrl: 'https://raw.githubusercontent.com/your-username/your-repo/main/images/shift3.png'
+    },
+    {
+      pattern: /other/i,
+      color: 'gray',
+      label: 'Others',
+      iconUrl: 'https://raw.githubusercontent.com/your-username/your-repo/main/images/others.png'
+    },
+    {
+      pattern: /.*/,
+      color: 'yellow',
+      label: 'Unspecified',
+      iconUrl: 'https://raw.githubusercontent.com/your-username/your-repo/main/images/unspecified.png'
+    }
   ];
 
   // Find the matching shift
-  const shiftMatch = shiftColors.find(sc => s.match(sc.pattern));
-  const color = shiftMatch ? shiftMatch.color : 'yellow';
+  const shiftMatch = shiftConfigs.find(sc => s.match(sc.pattern));
+  const iconUrl = shiftMatch ? shiftMatch.iconUrl : 'https://raw.githubusercontent.com/your-username/your-repo/main/images/unspecified.png';
   const shiftLabel = shiftMatch ? shiftMatch.label : 'Unspecified';
 
-  // Create a Font Awesome icon with background color
-  const icon = L.divIcon({
-    html: `<i class="fas fa-map-marker-alt fa-marker" style="--marker-bg: ${color};"></i>`,
-    className: '',
+  // Create a Leaflet icon with GitHub image
+  const icon = L.icon({
+    iconUrl: iconUrl,
     iconSize: [30, 30],
     iconAnchor: [15, 30],
-    popupAnchor: [0, -30]
+    popupAnchor: [0, -30],
+    shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
+    shadowSize: [41, 41],
+    shadowAnchor: [12, 40]
   });
 
   const marker = L.marker([record.latlng.lat, record.latlng.lng], { icon }).addTo(map);
-  // Update the record's shift label for consistent display
   record.displayShift = shiftLabel;
   marker.bindPopup(renderPopup(record));
   displayedMarkers.push({ marker, data: record });
@@ -361,10 +363,10 @@ function renderPersonnelTable(filtered) {
     return;
   }
 
-  const shiftColors = [
-    { pattern: /1st.*shift/i, color: 'green', label: '1st Shift' },
-    { pattern: /2nd.*shift/i, color: 'purple', label: '2nd Shift' },
-    { pattern: /3rd.*shift/i, color: 'orange', label: '3rd Shift' },
+  const shiftConfigs = [
+    { pattern: /1st.*shift/i, color: 'green', label: 'Shift 1' },
+    { pattern: /2nd.*shift/i, color: 'purple', label: 'Shift 2' },
+    { pattern: /3rd.*shift/i, color: 'orange', label: 'Shift 3' },
     { pattern: /other/i, color: 'gray', label: 'Others' },
     { pattern: /.*/, color: 'yellow', label: 'Unspecified' }
   ];
@@ -376,7 +378,7 @@ function renderPersonnelTable(filtered) {
     const name = personnelList.length > 1 ? `${firstPerson.name} and buddy` : firstPerson.name;
     const mobile = firstPerson.mobile || '';
     const s = normalize(r.shift || '');
-    const shiftMatch = shiftColors.find(sc => s.match(sc.pattern));
+    const shiftMatch = shiftConfigs.find(sc => s.match(sc.pattern));
     const shiftColor = shiftMatch ? shiftMatch.color : 'yellow';
     const shiftLabel = r.displayShift || (shiftMatch ? shiftMatch.label : 'Unspecified');
     rows.push({ name: name, mobile: mobile, call: r.callsign || '', shift: shiftLabel, shiftColor, r });
@@ -405,20 +407,20 @@ function renderPersonnelTable(filtered) {
 }
 
 /* -------------------- Summary -------------------- */
-function updateSummary(filtered){
-  const total = filtered.reduce((a,r) => a + ((r.PersonnelList && r.PersonnelList.length) || 1), 0);
+function updateSummary(filtered) {
+  const total = filtered.reduce((a, r) => a + ((r.PersonnelList && r.PersonnelList.length) || 1), 0);
   summaryBox.innerHTML = (selectedStation === 'All') ? `Total Personnel: ${total}` : `<b>${escapeHtml(selectedStation)}</b><br>Personnel: ${total}`;
 }
 
 /* -------------------- Apply filters -------------------- */
-function applyFilters(){
+function applyFilters() {
   clearMarkers();
   const filtered = allData.filter(d =>
     (selectedStation === 'All' || normalize(d.area) === normalize(selectedStation)) &&
     (selectedShift === 'All' || normalize(d.shift) === normalize(selectedShift))
   );
 
-  if(!filtered.length){
+  if (!filtered.length) {
     personnelTbody.innerHTML = '<tr><td colspan="4" style="opacity:0.6;padding:10px;text-align:center">No deployments found</td></tr>';
     summaryBox.innerHTML = '⚠️ No data found.';
     return;
@@ -430,8 +432,8 @@ function applyFilters(){
 }
 
 /* -------------------- Load CSV and initialize -------------------- */
-async function loadData(){
-  try{
+async function loadData() {
+  try {
     const rows = await fetchCsv(DEPLOYMENT_CSV);
     allData = rows.map(r => {
       const record = {
@@ -445,7 +447,7 @@ async function loadData(){
         latlng: parseLatLng(getField(r, 'Lat_Long (e.g. 9.33608, 123.30659)', 'Lat_Long', 'Coordinates')),
         PersonnelList: parsePersonnel(getField(r, 'Personnel (Rank_FName_MI_LN (Contact #)', 'Personnel'))
       };
-      if(record.photo) record.photo = makeDisplayUrl(record.photo);
+      if (record.photo) record.photo = makeDisplayUrl(record.photo);
       return record;
     });
 
@@ -454,20 +456,21 @@ async function loadData(){
     const shifts = [...new Set(allData.map(d => (d.shift || 'Unspecified').trim()))].sort();
     shiftFilterTop.innerHTML = '<option value="All">All Shifts</option>' + shifts.map(s => `<option value="${escapeHtml(s)}">${escapeHtml(s)}</option>`).join('');
 
-    selectedStation = 'All'; selectedShift = 'All';
+    selectedStation = 'All';
+    selectedShift = 'All';
     applyFilters();
     updateTimestamp();
-  }catch(err){
+  } catch (err) {
     console.error(err);
     alert('Failed to load CSV. Make sure the sheet is published as CSV and URL is public.');
   }
 }
 
-function updateTimestamp(){
+function updateTimestamp() {
   const el = document.getElementById('lastUpdated');
-  if(!el) return;
+  if (!el) return;
   const now = new Date();
-  const options = {year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit'};
+  const options = { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' };
   el.textContent = "Last updated: " + now.toLocaleString('en-US', options);
 }
 
@@ -479,7 +482,6 @@ document.getElementById('refreshBtn').onclick = () => loadData();
 
 /* -------------------- Start -------------------- */
 loadData();
-
 </script>
 </body>
 </html>
